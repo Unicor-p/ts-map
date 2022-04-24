@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using TsMap2.Exceptions;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Scs.FileSystem.Entry {
     public class ScsPrefabEntry : AbstractScsEntry< Dictionary< ulong, TsPrefab > > {
         private readonly Dictionary< ulong, TsPrefab > _prefabs = new Dictionary< ulong, TsPrefab >();
 
         public Dictionary< ulong, TsPrefab > List() {
-            VerifyRfs();
-
-            ScsDirectory worldDirectory = Store.Rfs.GetDirectory( ScsPath.Def.WorldPath );
+            UberDirectory worldDirectory = Store.Ubs.GetDirectory( ScsPath.Def.WorldPath );
             if ( worldDirectory == null ) {
                 var message = $"[Job][Prefab] Could not read '{ScsPath.Def.WorldPath}' dir";
                 throw new ScsEntryException( message );
             }
 
-            List< ScsFile > prefabFiles = worldDirectory.GetFiles( ScsPath.Def.PrefabFileName );
-            if ( prefabFiles == null ) {
+            List< string > prefabFilesName = worldDirectory.GetFiles( ScsPath.Def.PrefabFileName );
+            if ( prefabFilesName == null ) {
                 var message = $"[Job][Prefab] Could not read {ScsPath.Def.PrefabFileName} files";
                 throw new ScsEntryException( message );
             }
 
-            foreach ( ScsFile prefabFile in prefabFiles ) {
-                if ( !prefabFile.GetFileName().StartsWith( "prefab" ) ) continue;
+            foreach ( string prefabFileName in prefabFilesName ) {
+                UberFile prefabFile = UberFileSystem.Instance.GetFile( $"def/world/{prefabFileName}" );
 
                 byte[] data = prefabFile.Entry.Read();
+                File.WriteAllText( $"C:\\Users\\emsm\\Downloads\\a\\{prefabFileName}", Encoding.UTF8.GetString( data ) );
                 Generate( data );
             }
 
@@ -41,20 +41,21 @@ namespace TsMap2.Scs.FileSystem.Entry {
             var path     = "";
             var category = "";
 
-            // var prefabs = new Dictionary< ulong, TsPrefab >();
             foreach ( string line in lines ) {
                 ( bool validLine, string key, string value ) = ScsSiiHelper.ParseLine( line );
 
                 if ( validLine )
                     switch ( key ) {
                         case "prefab_model":
-                            token = ScsHashHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 1 ] ) );
+                            token = ScsTokenHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 1 ] ) );
                             break;
                         case "prefab_desc":
-                            path = ScsHelper.GetFilePath( value.Split( '"' )[ 1 ] );
+                            path = PathHelper.GetFilePath( value.Split( '"' )[ 1 ] );
                             break;
                         case "category":
-                            category = value.Split( '"' )[ 1 ];
+                            category = value.Contains( '"' )
+                                           ? value.Split( '"' )[ 1 ]
+                                           : value.Trim();
                             break;
                     }
 
@@ -77,7 +78,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
         private TsPrefab Parse( string path, ulong token, string category ) {
             var fileOffset = 0x0;
 
-            ScsFile file = Store.Rfs.GetFileEntry( path );
+            UberFile file = Store.Ubs.GetFile( path );
 
             if ( file == null ) return null;
 
@@ -113,8 +114,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
         }
 
         private void AddPrefab( TsPrefab prefab ) {
-            if ( prefab.Token != 0 && !_prefabs.ContainsKey( prefab.Token ) )
-                _prefabs.Add( prefab.Token, prefab );
+            if ( prefab.Token != 0 && !_prefabs.ContainsKey( prefab.Token ) ) _prefabs.Add( prefab.Token, prefab );
         }
     }
 
@@ -159,7 +159,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
                 var spawnPoint = new TsSpawnPoint {
                     X    = MemoryHelper.ReadSingle( stream, spawnPointBaseOffset ),
                     Z    = MemoryHelper.ReadSingle( stream, spawnPointBaseOffset + 0x08 ),
-                    Type = (TsSpawnPointType) MemoryHelper.ReadUInt32( stream, spawnPointBaseOffset + 0x1C )
+                    Type = (TsSpawnPointType)MemoryHelper.ReadUInt32( stream, spawnPointBaseOffset + 0x1C )
                 };
                 spawnPoints.Add( spawnPoint );
                 // Log.Msg($"Spawn point of type: {spawnPoint.Type} in {_filePath}");
@@ -176,8 +176,8 @@ namespace TsMap2.Scs.FileSystem.Entry {
             for ( var i = 0; i < mapPointCount; i++ ) {
                 int   mapPointBaseOffset    = mapPointOffset + i * TsPrefab.MapPointBlockSize;
                 byte  roadLookFlags         = MemoryHelper.ReadUint8( stream, mapPointBaseOffset + 0x01 );
-                var   laneTypeFlags         = (byte) ( roadLookFlags & 0x0F );
-                var   laneOffsetFlags       = (byte) ( roadLookFlags >> 4 );
+                var   laneTypeFlags         = (byte)( roadLookFlags & 0x0F );
+                var   laneOffsetFlags       = (byte)( roadLookFlags >> 4 );
                 sbyte controlNodeIndexFlags = MemoryHelper.ReadInt8( stream, mapPointBaseOffset + 0x04 );
                 int laneOffset = laneOffsetFlags switch {
                                      1 => 1,

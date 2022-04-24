@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Factory.Json {
     public class TsOverlaysJsonFactory : JsonFactory< TsMapOverlays > {

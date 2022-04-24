@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Serilog;
 using TsMap2.Helper;
-using TsMap2.Model.TsMapItem;
 using TsMap2.Scs;
 using TsMap2.Scs.FileSystem;
 using TsMap2.Scs.FileSystem.Map;
@@ -14,41 +12,32 @@ namespace TsMap2.Job.Parse.Map {
         protected override void Do() {
             Log.Debug( "[Job][MapFiles] Loading" );
 
-            // --- Check RFS
-            if ( Store().Rfs == null )
-                throw new JobException( "[Job][MapFiles] The root file system was not initialized. Check the game path", JobName(), null );
-
-            ScsDirectory baseMapEntry = Store().Rfs.GetDirectory( ScsPath.Map.MapDirectory );
+            UberDirectory baseMapEntry = Store().Ubs.GetDirectory( ScsPath.Map.MapDirectory );
             if ( baseMapEntry == null ) {
                 var message = $"[Job][MapFiles] Could not read {ScsPath.Map.MapDirectory} dir";
                 throw new JobException( message, JobName(), ScsPath.Map.MapDirectory );
             }
 
-            List< ScsFile >
-                mbd = baseMapEntry
-                      .Files
-                      .Values
-                      .Where( x => x.GetExtension().Equals( ScsPath.Map.MapExtension ) )
-                      .ToList(); // Get the map names from the mbd files
-            if ( mbd.Count == 0 ) {
+            List< string > mbdFilePaths = baseMapEntry.GetFilesByExtension( "map", ".mbd" );
+
+            if ( mbdFilePaths.Count == 0 ) {
                 var message = $"[Job][MapFiles] Could not find {ScsPath.Map.MapExtension} file";
                 throw new JobException( message, JobName(), ScsPath.Map.MapExtension );
             }
 
 
             var sectorFiles = new List< string >();
-            foreach ( ScsFile file in mbd ) {
-                string mapName = file.GetFileName();
-                // this.IsEts2 = !( mapName == "usa" );
 
-                ScsDirectory mapFileDir = Store().Rfs.GetDirectory( $"map/{mapName}" );
+            foreach ( string filePath in mbdFilePaths ) {
+                string mapName = PathHelper.GetFileNameWithoutExtensionFromPath( filePath );
+
+                UberDirectory mapFileDir = Store().Ubs.GetDirectory( $"map/{mapName}" );
                 if ( mapFileDir == null ) {
                     var message = $"[Job][MapFiles] Could not read map/{mapName} directory";
                     throw new JobException( message, JobName(), mapName );
                 }
 
-                // sectorFiles = mapFileDir.GetFiles( ScsPath.Map.MapFileExtension ).Select( x => x.GetPath() ).ToList();
-                sectorFiles.AddRange( mapFileDir.GetFiles( ScsPath.Map.MapFileExtension ).Select( x => x.GetPath() ).ToList() );
+                sectorFiles.AddRange( mapFileDir.GetFilesByExtension( $"map/{mapName}", ".base" ) );
             }
 
             sectorFiles.ForEach( Parse );
@@ -63,18 +52,18 @@ namespace TsMap2.Job.Parse.Map {
             Log.Information( "[Job][MapFiles] Loaded. MapAreas: {0}",         Store().Map.MapAreas.Count );
         }
 
-        private void Parse( string path ) {
-            ScsFile file  = Store().Rfs.GetFileEntry( path );
-            var     empty = false;
+        private void Parse( string filePath ) {
+            UberFile file  = Store().Ubs.GetFile( filePath );
+            var      empty = false;
 
             if ( file == null ) // empty = true;
                 return;
 
             byte[] stream = file.Entry.Read();
-            var    sector = new ScsSector( path, stream );
+            var    sector = new ScsSector( filePath, stream );
 
             if ( sector.Version < 825 ) {
-                Log.Warning( $"{path} version ({sector.Version}) is too low, min. is 825" );
+                Log.Warning( $"{filePath} version ({sector.Version}) is too low, min. is 825" );
                 return;
             }
 
@@ -86,22 +75,22 @@ namespace TsMap2.Job.Parse.Map {
 
                 if ( sector.Version <= 825 ) type++; // after version 825 all types were pushed up 1
 
-                TsMapItem mapItem;
+                ScsMapItem mapItem;
                 switch ( type ) {
                     case ScsItemType.Road: {
-                        mapItem           =  new TsMapRoadItem( sector );
+                        mapItem           =  new ScsMapRoadItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
                     }
                     case ScsItemType.Prefab: {
-                        mapItem           =  new TsMapPrefabItem( sector );
+                        mapItem           =  new ScsMapPrefabItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
                     }
                     case ScsItemType.Company: {
-                        mapItem           =  new TsMapCompanyItem( sector );
+                        mapItem           =  new ScsMapCompanyItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
@@ -117,19 +106,19 @@ namespace TsMap2.Job.Parse.Map {
                         break;
                     }
                     case ScsItemType.City: {
-                        mapItem           =  new TsMapCityItem( sector );
+                        mapItem           =  new ScsMapCityItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
                     }
                     case ScsItemType.MapOverlay: {
-                        mapItem           =  new TsMapMapOverlayItem( sector );
+                        mapItem           =  new ScsMapMapOverlayItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
                     }
                     case ScsItemType.Ferry: {
-                        mapItem           =  new TsMapFerryItem( sector );
+                        mapItem           =  new ScsMapFerryItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
@@ -140,7 +129,7 @@ namespace TsMap2.Job.Parse.Map {
                         break;
                     }
                     case ScsItemType.Trigger: {
-                        mapItem           =  new TsMapTriggerItem( sector );
+                        mapItem           =  new ScsMapTriggerItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
@@ -171,24 +160,24 @@ namespace TsMap2.Job.Parse.Map {
                         break;
                     }
                     case ScsItemType.MapArea: {
-                        mapItem           =  new TsMapAreaItem( sector );
+                        mapItem           =  new ScsMapAreaItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
                     }
                     case ScsItemType.Cutscene: {
-                        mapItem           =  new TsMapCutsceneItem( sector );
+                        mapItem           =  new ScsMapCutsceneItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         Store().Map.AddItem( mapItem );
                         break;
                     }
                     case ScsItemType.VisibilityArea: {
-                        mapItem           =  new TsVisibilityAreaItem( sector );
+                        mapItem           =  new ScsVisibilityAreaItem( sector );
                         sector.LastOffset += mapItem.BlockSize;
                         break;
                     }
                     default: {
-                        Log.Warning( "Unknown Type: {0} in {1} @ {2}", type, Path.GetFileName( path ), sector.LastOffset );
+                        Log.Warning( "Unknown Type: {0} in {1} @ {2}", type, Path.GetFileName( filePath ), sector.LastOffset );
                         break;
                     }
                 }
@@ -196,7 +185,7 @@ namespace TsMap2.Job.Parse.Map {
 
             int nodeCount = MemoryHelper.ReadInt32( stream, sector.LastOffset );
             for ( var i = 0; i < nodeCount; i++ ) {
-                var node = new TsNode( sector );
+                var node = new ScsNode( sector );
                 Store().Map.UpdateEdgeCoords( node );
                 Store().Map.AddNode( node );
                 sector.LastOffset += 0x34;
@@ -210,7 +199,7 @@ namespace TsMap2.Job.Parse.Map {
             }
 
             if ( sector.LastOffset != stream.Length )
-                Log.Warning( $"File '{Path.GetFileName( path )}' was not read correctly. Read offset was at 0x{sector.LastOffset:X} while file is 0x{stream.Length:X} bytes long." );
+                Log.Warning( $"File '{Path.GetFileName( filePath )}' was not read correctly. Read offset was at 0x{sector.LastOffset:X} while file is 0x{stream.Length:X} bytes long." );
 
             sector.ClearFileData();
         }

@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Serilog;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Job.Builder {
     public class BuilderCitiesJob : ThreadJob {
         protected override void Do() {
             Log.Debug( "[Job][Builder][City] Building" );
 
-            foreach ( KeyValuePair< ulong, TsMapCityItem > pair in Store().Map.Cities ) {
-                TsMapCityItem item = pair.Value;
-                TsNode?       node = Store().Map.GetNodeByUid( item.NodeUid );
+            foreach ( KeyValuePair< ulong, ScsMapCityItem > pair in Store().Map.Cities ) {
+                ScsMapCityItem item = pair.Value;
+                ScsNode?       node = Store().Map.GetNodeByUid( item.NodeUid );
 
                 if ( node == null ) {
                     Log.Debug( "[Job][Builder][City] City '{0}' skipped and will be removed", item.City.Name );

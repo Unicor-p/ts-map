@@ -1,10 +1,10 @@
 using Serilog;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 using TsMap2.Scs;
 using TsMap2.Scs.FileSystem.Entry;
 
 namespace TsMap2.Job.Parse {
-    public class ParseGameJob : ThreadJob {
+    public class ParseGameJob : SynchronJob {
         protected override void Do() {
             Log.Debug( "[Job][Game] Loading" );
 

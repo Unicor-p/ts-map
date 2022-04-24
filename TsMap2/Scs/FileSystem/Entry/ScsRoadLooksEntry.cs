@@ -3,28 +3,30 @@ using System.Globalization;
 using System.Text;
 using TsMap2.Exceptions;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Scs.FileSystem.Entry {
     public class ScsRoadLooksEntry : AbstractScsEntry< Dictionary< ulong, TsRoadLook > > {
         private readonly Dictionary< ulong, TsRoadLook > _roadLooks = new Dictionary< ulong, TsRoadLook >();
 
         public Dictionary< ulong, TsRoadLook > List() {
-            ScsDirectory worldDirectory = Store.Rfs.GetDirectory( ScsPath.Def.WorldPath );
+            UberDirectory worldDirectory = Store.Ubs.GetDirectory( ScsPath.Def.WorldPath );
             if ( worldDirectory == null ) {
                 var message = $"[Job][RoadLook] Could not read '{ScsPath.Def.WorldPath}' dir";
                 throw new ScsEntryException( message );
             }
 
-            List< ScsFile > roadLookFiles = worldDirectory.GetFiles( ScsPath.Def.RoadLook );
-            if ( roadLookFiles == null ) {
+            List< string > roadLookFilesName = worldDirectory.GetFiles( ScsPath.Def.RoadLook );
+            if ( roadLookFilesName == null ) {
                 var message = $"[Job][RoadLook] Could not read {ScsPath.Def.RoadLook} files";
                 throw new ScsEntryException( message );
             }
 
             // var roadLooks = new Dictionary< ulong, TsRoadLook >();
-            foreach ( ScsFile roadLookFile in roadLookFiles ) {
-                if ( !roadLookFile.GetFileName().StartsWith( "road" ) ) continue;
+            foreach ( string roadLookFileName in roadLookFilesName ) {
+                if ( !roadLookFileName.StartsWith( "road" ) ) continue;
+                UberFile roadLookFile = UberFileSystem.Instance.GetFile( $"def/world/{roadLookFileName}" );
+
                 byte[] data = roadLookFile.Entry.Read();
                 Generate( data );
             }
@@ -41,8 +43,8 @@ namespace TsMap2.Scs.FileSystem.Entry {
                 if ( validLine ) {
                     if ( key == "road_look" )
                         roadLook =
-                            new TsRoadLook( ScsHashHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 1 ]
-                                                                                                 .Trim( '{' ) ) ) );
+                            new TsRoadLook( ScsTokenHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 1 ]
+                                                                                                  .Trim( '{' ) ) ) );
                     if ( roadLook == null ) continue;
                     if ( key == "lanes_left[]" )
                         roadLook.LanesLeft.Add( value );

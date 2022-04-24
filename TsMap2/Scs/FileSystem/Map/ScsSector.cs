@@ -9,9 +9,10 @@ namespace TsMap2.Scs.FileSystem.Map {
         // private         bool  _empty;
         public int LastOffset = 0x14;
 
-        public ScsSector( string filePath, byte[] stream ) {
-            FilePath = filePath;
-            Stream   = stream;
+        public ScsSector( /*string archivePath,*/ string filePath, byte[] stream ) {
+            FilePath    = filePath;
+            Stream      = stream;
+            ArchivePath = filePath;
 
             // int fileOffset = LastOffset;
 
@@ -21,11 +22,12 @@ namespace TsMap2.Scs.FileSystem.Map {
             // Z = MemoryHelper.ReadSingle( Stream, fileOffset += 0x08 );
         }
 
-        public string      FilePath  { get; }
-        public ScsItemType ItemType  => (ScsItemType)MemoryHelper.ReadUInt32( Stream, LastOffset );
-        public uint        ItemCount => BitConverter.ToUInt32( Stream, 0x10 );
-        public int         Version   => BitConverter.ToInt32( Stream, 0x0 );
-        public byte[]      Stream    { get; private set; }
+        public string      FilePath    { get; }
+        public string      ArchivePath { get; }
+        public ScsItemType ItemType    => (ScsItemType)MemoryHelper.ReadUInt32( Stream, LastOffset );
+        public uint        ItemCount   => BitConverter.ToUInt32( Stream, 0x10 );
+        public int         Version     => BitConverter.ToInt32( Stream, 0x0 );
+        public byte[]      Stream      { get; private set; }
 
         public void ClearFileData() {
             Stream = null;

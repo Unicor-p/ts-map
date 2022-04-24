@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TsMap2.Helper;
 using TsMap2.Model.MapPalette;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Model {
     public class Settings {

@@ -1,9 +1,8 @@
 ﻿using System.IO;
 using Serilog;
-using TsMap2.Model.TsMapItem;
 
 namespace TsMap2.Scs.FileSystem.Map {
-    public class ScsMapBusStopItem : TsMapItem {
+    public class ScsMapBusStopItem : ScsMapItem {
         public ScsMapBusStopItem( ScsSector sector ) : base( sector, sector.LastOffset ) {
             Valid = false;
             if ( Sector.Version < 836 || Sector.Version >= 847 )
@@ -11,7 +10,8 @@ namespace TsMap2.Scs.FileSystem.Map {
             else if ( Sector.Version >= 836 || Sector.Version < 847 )
                 TsBusStopItem836();
             else
-                Log.Warning( $"Unknown base file version ({Sector.Version}) for item {Type} in file '{Path.GetFileName( Sector.FilePath )}' @ {Sector.LastOffset}." );
+                Log.Error( $"Unknown base file version ({Sector.Version}) for item {Type} "
+                           + $"in file '{Path.GetFileName( Sector.FilePath )}' @ {Sector.LastOffset} from '{Sector.FilePath}'" );
         }
 
         private void TsBusStopItem825() {

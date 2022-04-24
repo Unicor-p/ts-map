@@ -73,34 +73,23 @@ namespace TsMap2 {
                             return 0;
                         }
 
-                        var s = new SettingsLoadJob();
-                        s.RunAndWait();
+                        new SettingsLoadJob().RunAndWait();
 
                         // -- Parse
-                        var c = new ParseScsDefJob();
-                        c.Run();
-
-                        var m = new ParseMapJob();
-                        m.Run();
-
-                        var o = new ParseOverlaysJob();
-                        o.Run();
+                        new ParseScsDefJob().Run();
+                        new ParseMapJob().Run();
+                        new ParseMapOverlaysJob().Run();
 
                         // -- Builder
-                        var b = new BuilderJob();
-                        b.Run();
+                        new BuilderJob().Run();
 
                         // -- Export
-                        var e = new ExportJob();
-                        e.Run();
-
-                        var t = new ExportTilesJob();
-                        t.Run();
+                        new ExportJob().Run();
+                        new ExportTilesJob().Run();
 
                         // -- Debug
                         if ( exportOverviewData ) {
-                            var d = new ExportDataOverviewJob();
-                            d.RunAndWait();
+                            new ExportDataOverviewJob().RunAndWait();
                         }
 
                         Log.Information( "Check your export at {0}", StoreHelper.Instance.Settings.OutputPath );

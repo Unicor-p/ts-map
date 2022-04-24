@@ -1,19 +1,19 @@
 ﻿using System.Drawing;
 using Serilog;
 using TsMap2.Helper;
-using TsMap2.Model;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Model.Ts;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Job.Parse.Overlays {
     public class ParseOverlayFerryJob : ThreadJob {
         protected override void Do() {
             Log.Information( "[Job][OverlayFerry] Parsing..." );
 
-            foreach ( TsMapFerryItem ferry in Store().Map.FerryConnections ) {
+            foreach ( ScsMapFerryItem ferry in Store().Map.FerryConnections ) {
                 Bitmap b = ferry.Overlay?.GetBitmap();
 
                 if ( !ferry.Valid || ferry.Hidden || b == null ) continue;
-                string overlayName = ScsHashHelper.TokenToString( ferry.OverlayToken );
+                string overlayName = ScsTokenHelper.TokenToString( ferry.OverlayToken );
 
                 if ( ferry.Train ) {
                     var ov = new TsMapOverlayItem( ferry.X, ferry.Z, overlayName, TsMapOverlayType.Train, b );

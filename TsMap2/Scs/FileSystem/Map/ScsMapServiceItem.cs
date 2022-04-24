@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using Serilog;
 using TsMap2.Helper;
-using TsMap2.Model.TsMapItem;
 
 namespace TsMap2.Scs.FileSystem.Map {
-    public class ScsMapServiceItem : TsMapItem {
+    public class ScsMapServiceItem : ScsMapItem {
         public ScsMapServiceItem( ScsSector sector ) : base( sector, sector.LastOffset ) {
             Valid = false;
             if ( Sector.Version < 855 )

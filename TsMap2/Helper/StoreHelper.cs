@@ -1,4 +1,5 @@
 using TsMap2.Model;
+using TsMap2.Model.Ts;
 using TsMap2.Scs.FileSystem;
 
 namespace TsMap2.Helper {
@@ -16,15 +17,17 @@ namespace TsMap2.Helper {
 
         private StoreHelper() { }
         public Settings       Settings { get; private set; } = new Settings();
-        public RootFileSystem Rfs      { get; private set; }
+        public UberFileSystem Ubs      => UberFileSystem.Instance;
 
         public static StoreHelper Instance { get; } = new StoreHelper();
+
+        public LocalizationManager Localization { get; } = new();
 
         // ---
 
         public void SetSetting( Settings settings ) {
             Settings = settings;
-            Rfs      = new RootFileSystem( settings.GetActiveGamePath() );
+            Ubs.AddSourceDirectory( settings.GetActiveGamePath() );
         }
     }
 }

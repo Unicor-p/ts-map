@@ -5,7 +5,7 @@ using TsMap2.Helper;
 
 namespace TsMap2.Job {
     public abstract class ParentThreadJob {
-        private readonly Dictionary< string, ThreadJob > _jobPool = new Dictionary< string, ThreadJob >();
+        private readonly Dictionary< string, JobInterface > _jobPool = new();
 
         public Task t { get; set; }
 
@@ -20,8 +20,8 @@ namespace TsMap2.Job {
                 t = Task.Factory.StartNew( () => {
                     Do();
 
-                    foreach ( KeyValuePair< string, ThreadJob > keyValuePair in _jobPool ) {
-                        ThreadJob job = keyValuePair.Value;
+                    foreach ( KeyValuePair< string, JobInterface > keyValuePair in _jobPool ) {
+                        JobInterface job = keyValuePair.Value;
 
                         job.Run();
                     }
@@ -34,7 +34,7 @@ namespace TsMap2.Job {
             }
         }
 
-        public void AddJob( ThreadJob job ) {
+        public void AddJob( JobInterface job ) {
             _jobPool.Add( job.JobName(), job );
         }
 

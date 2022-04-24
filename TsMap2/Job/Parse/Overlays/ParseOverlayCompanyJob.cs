@@ -3,36 +3,36 @@ using System.Drawing;
 using System.Linq;
 using Serilog;
 using TsMap2.Helper;
-using TsMap2.Model;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Model.Ts;
 using TsMap2.Scs;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Job.Parse.Overlays {
     public class ParseOverlayCompanyJob : ThreadJob {
         protected override void Do() {
             Log.Information( "[Job][OverlayCompany] Parsing..." );
 
-            foreach ( TsMapCompanyItem company in Store().Map.Companies ) {
+            foreach ( ScsMapCompanyItem company in Store().Map.Companies ) {
                 Bitmap b = company.Overlay?.GetBitmap();
 
                 if ( !company.Valid || company.Hidden || b == null ) continue;
 
-                string overlayName = ScsHashHelper.TokenToString( company.OverlayToken );
+                string overlayName = ScsTokenHelper.TokenToString( company.OverlayToken );
                 var    point       = new PointF( company.X, company.Z );
 
                 if ( company.Nodes.Count > 0 ) {
-                    TsMapPrefabItem prefab = Store().Map.Prefabs.FirstOrDefault( x => x.Uid == company.Nodes[ 0 ] );
+                    ScsMapPrefabItem prefab = Store().Map.Prefabs.FirstOrDefault( x => x.Uid == company.Nodes[ 0 ] );
                     if ( prefab != null ) {
-                        TsNode originNode = Store().Map.GetNodeByUid( prefab.Nodes[ 0 ] );
+                        ScsNode originNode = Store().Map.GetNodeByUid( prefab.Nodes[ 0 ] );
                         if ( prefab.Prefab.PrefabNodes == null )
                             return;
 
                         TsPrefabNode mapPointOrigin = prefab.Prefab.PrefabNodes[ prefab.Origin ];
 
-                        var rot = (float) ( originNode.Rotation
-                                            - Math.PI
-                                            - Math.Atan2( mapPointOrigin.RotZ, mapPointOrigin.RotX )
-                                            + Math.PI / 2 );
+                        var rot = (float)( originNode.Rotation
+                                           - Math.PI
+                                           - Math.Atan2( mapPointOrigin.RotZ, mapPointOrigin.RotX )
+                                           + Math.PI / 2 );
 
                         float prefabStartX = originNode.X - mapPointOrigin.X;
                         float prefabStartZ = originNode.Z - mapPointOrigin.Z;

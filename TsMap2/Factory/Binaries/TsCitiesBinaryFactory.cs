@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Factory.Binaries {
     public class TsCitiesBinaryFactory : BinaryFactory< List< TsCity > > {

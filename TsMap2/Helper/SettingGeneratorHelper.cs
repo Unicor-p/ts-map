@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Helper {
     public static class SettingGeneratorHelper {

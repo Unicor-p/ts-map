@@ -2,7 +2,7 @@
 using TsMap2.Scs.FileSystem.Entry;
 
 namespace TsMap2.Job.Parse.Def {
-    public class ParseDefPrefabsJob : ThreadJob {
+    public class ParseDefPrefabsJob : SynchronJob {
         protected override void Do() {
             Log.Debug( "[Job][Prefab] Loading" );
 

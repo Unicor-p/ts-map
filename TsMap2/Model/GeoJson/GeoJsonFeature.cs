@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Model.GeoJson {
     public class Feature {

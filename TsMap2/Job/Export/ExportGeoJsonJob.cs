@@ -2,8 +2,8 @@
 using Serilog;
 using TsMap2.Factory.Json;
 using TsMap2.Helper;
-using TsMap2.Model;
 using TsMap2.Model.GeoJson;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Job.Export {
     public class ExportGeoJsonJob : ThreadJob {

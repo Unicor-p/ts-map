@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using TsMap2.Exceptions;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Scs.FileSystem.Entry {
     public class ScsFerryConnectionEntry : AbstractScsEntry< List< TsFerryConnection > > {
         private readonly List< TsFerryConnection > _ferryConnections = new List< TsFerryConnection >();
 
         public List< TsFerryConnection > List() {
-            VerifyRfs();
-
-            ScsDirectory connectionDirectory = Store.Rfs.GetDirectory( ScsPath.Def.FerryConnectionPath );
+            UberDirectory connectionDirectory = Store.Ubs.GetDirectory( ScsPath.Def.FerryConnectionPath );
             if ( connectionDirectory == null ) {
                 var message = $"Could not read '{ScsPath.Def.FerryConnectionPath}' dir";
                 throw new ScsEntryException( message );
             }
 
-            List< ScsFile > ferryConnectionFiles = connectionDirectory.GetFiles( ScsPath.ScsFileExtension );
-            if ( ferryConnectionFiles == null ) {
+            List< string > ferryConnectionFilesName = connectionDirectory.GetFilesByExtension( "def/ferry/connection", ".sui", ".sii" );
+            if ( ferryConnectionFilesName == null ) {
                 var message = "Could not read ferry connection files";
                 throw new ScsEntryException( message );
             }
 
-            foreach ( ScsFile ferryConnectionFile in ferryConnectionFiles ) {
-                byte[] data = ferryConnectionFile.Entry.Read();
+            foreach ( string ferryConnectionFileName in ferryConnectionFilesName ) {
+                UberFile ferryConnectionFile = UberFileSystem.Instance.GetFile( ferryConnectionFileName );
+                byte[]   data                = ferryConnectionFile.Entry.Read();
                 Generate( data );
             }
 
@@ -64,8 +64,8 @@ namespace TsMap2.Scs.FileSystem.Entry {
                     if ( key == "ferry_connection" ) {
                         string[] portIds = value.Split( '.' );
                         ferryConnection = new TsFerryConnection {
-                            StartPortToken = ScsHashHelper.StringToToken( portIds[ 1 ] ),
-                            EndPortToken   = ScsHashHelper.StringToToken( portIds[ 2 ].TrimEnd( '{' ).Trim() )
+                            StartPortToken = ScsTokenHelper.StringToToken( portIds[ 1 ] ),
+                            EndPortToken   = ScsTokenHelper.StringToToken( portIds[ 2 ].TrimEnd( '{' ).Trim() )
                         };
                     }
                 }
@@ -82,6 +82,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
         }
 
         private void AddFerryConnection( TsFerryConnection ferryConnection ) {
+            if ( ferryConnection.StartPortLocation != PointF.Empty && ferryConnection.EndPortLocation != PointF.Empty ) return;
             TsFerryConnection existingItem = _ferryConnections.FirstOrDefault( item =>
                                                                                    item.StartPortToken  == ferryConnection.StartPortToken
                                                                                    && item.EndPortToken == ferryConnection.EndPortToken

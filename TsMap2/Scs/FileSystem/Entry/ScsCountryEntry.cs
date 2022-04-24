@@ -3,27 +3,27 @@ using System.Globalization;
 using System.Text;
 using TsMap2.Exceptions;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Scs.FileSystem.Entry {
     public class ScsCountryEntry : AbstractScsEntry< TsCountry > {
         public Dictionary< ulong, TsCountry > List() {
-            VerifyRfs();
-
-            ScsDirectory defDirectory = Store.Rfs.GetDirectory( ScsPath.Def.DefFolderName );
+            UberDirectory defDirectory = Store.Ubs.GetDirectory( ScsPath.Def.DefFolderName );
             if ( defDirectory == null ) {
                 var message = $"[Job][Country] Could not read '{ScsPath.Def.DefFolderName}' dir";
                 throw new ScsEntryException( message );
             }
 
-            List< ScsFile > countryFiles = defDirectory.GetFiles( ScsPath.Def.CountryFileName );
-            if ( countryFiles == null ) {
+            List< string > countryFilesName = defDirectory.GetFiles( ScsPath.Def.CountryFileName );
+            if ( countryFilesName == null ) {
                 var message = $"[Job][Country] Could not read {ScsPath.Def.CountryFileName} files";
                 throw new ScsEntryException( message );
             }
 
             var countries = new Dictionary< ulong, TsCountry >();
-            foreach ( ScsFile countryFile in countryFiles ) {
+            foreach ( string countryFileName in countryFilesName ) {
+                UberFile countryFile = UberFileSystem.Instance.GetFile( $"def/{countryFileName}" );
+
                 byte[]   data  = countryFile.Entry.Read();
                 string[] lines = Encoding.UTF8.GetString( data ).Split( '\n' );
 
@@ -31,7 +31,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
                     if ( line.TrimStart().StartsWith( "#" ) ) continue;
                     if ( !line.Contains( "@include" ) ) continue;
 
-                    string path = ScsHelper.GetFilePath( line.Split( '"' )[ 1 ], ScsPath.Def.DefFolderName );
+                    string path = PathHelper.GetFilePath( line.Split( '"' )[ 1 ], ScsPath.Def.DefFolderName );
 
                     TsCountry country = Get( path );
 
@@ -62,7 +62,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
 
                 switch ( key ) {
                     case "country_data":
-                        token = ScsHashHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 2 ] ) );
+                        token = ScsTokenHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 2 ] ) );
                         break;
                     case "country_id":
                         id = int.Parse( value );

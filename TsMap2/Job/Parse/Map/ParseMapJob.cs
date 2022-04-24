@@ -2,7 +2,7 @@
     public class ParseMapJob : ParentThreadJob {
         protected override void Do() {
             AddJob( new ParseMapFilesJob() );
-            AddJob( new ParseMapLocalizationsJob() );
+            // AddJob( new ParseMapLocalizationsJob() );
         }
     }
 }

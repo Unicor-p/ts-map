@@ -1,14 +1,14 @@
 ﻿using System.Drawing;
 using Serilog;
-using TsMap2.Model;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Model.Ts;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Job.Parse.Overlays {
     public class ParseOverlaysOthersJob : ThreadJob {
         protected override void Do() {
             Log.Information( "[Job][OverlayOther] Parsing..." );
 
-            foreach ( TsMapMapOverlayItem overlay in Store().Map.MapOverlays ) {
+            foreach ( ScsMapMapOverlayItem overlay in Store().Map.MapOverlays ) {
                 Bitmap b = overlay.Overlay?.GetBitmap();
 
                 if ( !overlay.Valid || overlay.Hidden || b == null ) continue;

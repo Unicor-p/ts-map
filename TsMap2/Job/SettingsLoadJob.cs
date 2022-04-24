@@ -26,7 +26,7 @@ namespace TsMap2.Job {
             settings.Mods.Reverse();
 
             foreach ( string mod in settings.Mods ) {
-                Store().Rfs.AddSourceFile( mod );
+                Store().Ubs.AddSourceFile( mod );
                 Log.Information( "[Job][Settings][Mod] {0} loaded", Path.GetFileName( mod ) );
             }
 

@@ -2,59 +2,66 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Serilog;
-using TsMap2.Exceptions;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Scs.FileSystem.Entry {
     public class ScsOverlayEntry : AbstractScsEntry< Dictionary< ulong, TsMapOverlay > > {
         private readonly ScsOverlayIconEntry               _overlayIconEntry = new ScsOverlayIconEntry();
         private readonly Dictionary< ulong, TsMapOverlay > _overlays         = new Dictionary< ulong, TsMapOverlay >();
-        private          ScsFile                           _currentMat;
+        private          UberFile                          _currentMat;
+
+        public TsMapOverlay? Get( string overlayName, ScsOverlayTypes overlayType ) {
+            if ( overlayName == "" ) return null;
+
+            string path = overlayType switch {
+                              ScsOverlayTypes.Road    => $"material/ui/map/road/road_{overlayName}.mat",
+                              ScsOverlayTypes.Company => $"material/ui/company/small/{overlayName}.mat",
+                              ScsOverlayTypes.Map     => $"material/ui/map/{overlayName}.mat",
+                              _                       => PathHelper.EnsureLocalPath( overlayName )
+                          };
+
+            ulong        hash    = CityHash.CityHash64( path );
+            TsMapOverlay overlay = Store.Def.LookupOverlay( hash );
+
+            if ( overlay != null )
+                return overlay;
+
+            UberFile matFile = UberFileSystem.Instance.GetFile( path );
+            _currentMat = matFile;
+            Generate( matFile.Entry.Read() );
+
+            return _overlays.Count == 0
+                       ? null
+                       : _overlays.First().Value;
+        }
 
         public Dictionary< ulong, TsMapOverlay > List() {
-            VerifyRfs();
+            var overlaysFiles = new List< string >();
 
-            ScsDirectory uiMapDirectory = Store.Rfs.GetDirectory( ScsPath.Def.MaterialUiMapPath );
-            if ( uiMapDirectory == null ) {
-                var message = $"[Job][MapOverlay] Could not read {ScsPath.Def.MaterialUiMapPath} dir";
-                throw new ScsEntryException( message );
-            }
+            overlaysFiles.AddRange( GetOverlayFiles( ScsPath.Def.MaterialUiMapPath,     ScsPath.ScsMatExtension ) );
+            overlaysFiles.AddRange( GetOverlayFiles( ScsPath.Def.MaterialUiCompanyPath, ScsPath.ScsMatExtension ) );
+            overlaysFiles.AddRange( GetOverlayFiles( ScsPath.Def.MaterialUiRoadPath,    ScsPath.ScsMatExtension ) );
 
-            List< ScsFile > matFiles = uiMapDirectory.GetFiles( $".{ScsPath.ScsMatExtension}" );
-            if ( matFiles == null ) {
-                var message = $"[Job][MapOverlay] Could not read .{ScsPath.ScsMatExtension} files";
-                throw new ScsEntryException( message );
-            }
-
-            ScsDirectory uiCompanyDirectory = Store.Rfs.GetDirectory( ScsPath.Def.MaterialUiCompanyPath );
-            if ( uiCompanyDirectory != null ) {
-                List< ScsFile > data = uiCompanyDirectory.GetFiles( $".{ScsPath.ScsMatExtension}" );
-                if ( data != null ) matFiles.AddRange( data );
-            } else {
-                var message = $"[Job][MapOverlay] Could not read .{ScsPath.Def.MaterialUiCompanyPath} dir";
-                throw new ScsEntryException( message );
-            }
-
-            ScsDirectory uiMapRoadDirectory = Store.Rfs.GetDirectory( ScsPath.Def.MaterialUiRoadPath );
-            if ( uiMapRoadDirectory != null ) {
-                List< ScsFile > data = uiMapRoadDirectory.GetFiles( $".{ScsPath.ScsMatExtension}" );
-                if ( data != null ) matFiles.AddRange( data );
-            } else {
-                var message = $"[Job][MapOverlay] Could not read .{ScsPath.Def.MaterialUiRoadPath} dir";
-                throw new ScsEntryException( message );
-            }
-
-            foreach ( ScsFile matFile in matFiles ) {
+            foreach ( string overlayFile in overlaysFiles ) {
+                UberFile matFile = UberFileSystem.Instance.GetFile( overlayFile );
                 _currentMat = matFile;
-                byte[] data = matFile.Entry.Read();
-                Generate( data );
+                Generate( matFile.Entry.Read() );
             }
 
             return _overlays;
+        }
+
+        private List< string > GetOverlayFiles( string directory, string extenstion ) {
+            UberDirectory  overlayDirectory = Store.Ubs.GetDirectory( directory );
+            List< string > overlaysFiles    = overlayDirectory.GetFilesByExtension( directory, $".{extenstion}" );
+            if ( overlaysFiles.Count == 0 ) return new List< string >();
+
+            return overlaysFiles;
         }
 
         public override Dictionary< ulong, TsMapOverlay > Generate( byte[] stream ) {
@@ -66,19 +73,19 @@ namespace TsMap2.Scs.FileSystem.Entry {
                 if ( !validLine ) continue;
                 if ( key != "texture" ) continue;
 
-                string objPath = ScsHelper.CombinePath( _currentMat.GetLocalPath(), value.Split( '"' )[ 1 ] );
+                string objPath = PathHelper.CombinePath( PathHelper.GetDirectoryPath( _currentMat.Path ), value.Split( '"' )[ 1 ] );
 
-                byte[] objData = Store.Rfs.GetFileEntry( objPath )?.Entry?.Read();
+                byte[]? objData = UberFileSystem.Instance.GetFile( objPath )?.Entry?.Read();
 
                 if ( objData == null ) break;
 
-                string path = ScsHelper.GetFilePath( Encoding.UTF8.GetString( objData, 0x30, objData.Length - 0x30 ) );
+                string path = PathHelper.EnsureLocalPath( Encoding.UTF8.GetString( objData, 0x30, objData.Length - 0x30 ) );
 
-                string name = _currentMat.GetFileName();
+                string name = PathHelper.GetFileNameFromPath( _currentMat.Path );
                 if ( name.StartsWith( "map" ) ) continue;
                 if ( name.StartsWith( "road_" ) ) name = name.Substring( 5 );
 
-                ulong        token   = ScsHashHelper.StringToToken( name );
+                ulong        token   = ScsTokenHelper.StringToToken( name );
                 TsMapOverlay overlay = Parse( path, token );
 
                 if ( overlay != null )
@@ -89,14 +96,14 @@ namespace TsMap2.Scs.FileSystem.Entry {
         }
 
         private TsMapOverlay Parse( string path, ulong token ) {
-            ScsFile file = Store.Rfs.GetFileEntry( path );
+            UberFile file = Store.Ubs.GetFile( path );
 
             if ( file != null ) {
                 OverlayIcon icon = _overlayIconEntry.Get( path );
 
                 if ( !icon.Valid ) return null;
 
-                var overlayBitmap = new Bitmap( (int) icon.Width, (int) icon.Height, PixelFormat.Format32bppArgb );
+                var overlayBitmap = new Bitmap( (int)icon.Width, (int)icon.Height, PixelFormat.Format32bppArgb );
 
                 BitmapData bd = overlayBitmap.LockBits( new Rectangle( 0, 0, overlayBitmap.Width, overlayBitmap.Height ), ImageLockMode.WriteOnly,
                                                         PixelFormat.Format32bppArgb );
@@ -115,8 +122,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
         }
 
         private void AddOverlay( TsMapOverlay mapOverlay ) {
-            if ( !_overlays.ContainsKey( mapOverlay.Token ) )
-                _overlays.Add( mapOverlay.Token, mapOverlay );
+            if ( !_overlays.ContainsKey( mapOverlay.Token ) ) _overlays.Add( mapOverlay.Token, mapOverlay );
         }
     }
 

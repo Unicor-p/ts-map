@@ -2,7 +2,7 @@
 using TsMap2.Scs.FileSystem.Entry;
 
 namespace TsMap2.Job.Parse.Def {
-    public class ParseDefCountriesJob : ThreadJob {
+    public class ParseDefCountriesJob : SynchronJob {
         protected override void Do() {
             Log.Debug( "[Job][Country] Loading" );
 

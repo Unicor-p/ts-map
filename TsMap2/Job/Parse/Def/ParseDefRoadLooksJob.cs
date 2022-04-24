@@ -2,7 +2,7 @@ using Serilog;
 using TsMap2.Scs.FileSystem.Entry;
 
 namespace TsMap2.Job.Parse.Def {
-    public class ParseDefRoadLooksJob : ThreadJob {
+    public class ParseDefRoadLooksJob : SynchronJob {
         protected override void Do() {
             Log.Debug( "[Job][RoadLook] Loading" );
 

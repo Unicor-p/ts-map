@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using TsMap2.Model;
 using TsMap2.Model.MapPalette;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Model.Ts;
 using TsMap2.Scs;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Helper.Map {
     public class MapRenderer {
@@ -59,7 +59,7 @@ namespace TsMap2.Helper.Map {
 
             long prefabTime = PrefabRender( g, startPoint, endPoint );
 
-            long roadTime = RoadRender( g, startPoint, endPoint );
+            long roadTime = RoadRender( g, startPoint, endPoint, scale );
 
             long mapOverlayTime = MapOverlaysRender( g, startPoint, endPoint );
 
@@ -99,11 +99,11 @@ namespace TsMap2.Helper.Map {
 
             if ( !_renderFlags.IsActive( RenderFlags.FerryConnections ) ) return DateTime.Now.Ticks - ferryStartTime;
 
-            IEnumerable< TsMapFerryItem > ferryConnections = _store.Map.FerryConnections.Where( item => !item.Hidden );
+            IEnumerable< ScsMapFerryItem > ferryConnections = _store.Map.FerryConnections.Where( item => !item.Hidden );
 
             var ferryPen = new Pen( _palette.FerryLines, 50 ) { DashPattern = new[] { 10f, 10f } };
 
-            foreach ( TsMapFerryItem ferryConnection in ferryConnections ) {
+            foreach ( ScsMapFerryItem ferryConnection in ferryConnections ) {
                 List< TsFerryConnection > connections = _store.Def.LookupFerryConnection( ferryConnection.FerryPortId );
 
                 foreach ( TsFerryConnection conn in connections ) {
@@ -165,20 +165,20 @@ namespace TsMap2.Helper.Map {
             long mapAreaStartTime = DateTime.Now.Ticks;
             if ( !_renderFlags.IsActive( RenderFlags.MapAreas ) ) return DateTime.Now.Ticks - mapAreaStartTime;
 
-            IEnumerable< TsMapAreaItem > mapAreas = _store.Map.MapAreas.Where( item =>
-                                                                                   item.X    >= startPoint.X - itemDrawMargin
-                                                                                   && item.X <= endPoint.X   + itemDrawMargin
-                                                                                   && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                   && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                                   && !item.Hidden )
-                                                          .ToList();
+            IEnumerable< ScsMapAreaItem > mapAreas = _store.Map.MapAreas.Where( item =>
+                                                                                    item.X    >= startPoint.X - itemDrawMargin
+                                                                                    && item.X <= endPoint.X   + itemDrawMargin
+                                                                                    && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                    && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                                    && !item.Hidden )
+                                                           .ToList();
 
 
-            foreach ( TsMapAreaItem mapArea in mapAreas.OrderBy( x => x.DrawOver ) ) {
+            foreach ( ScsMapAreaItem mapArea in mapAreas.OrderBy( x => x.DrawOver ) ) {
                 var points = new List< PointF >();
 
                 foreach ( ulong mapAreaNode in mapArea.NodeUids ) {
-                    TsNode node = _store.Map.GetNodeByUid( mapAreaNode );
+                    ScsNode node = _store.Map.GetNodeByUid( mapAreaNode );
                     if ( node == null ) continue;
                     points.Add( new PointF( node.X, node.Z ) );
                 }
@@ -197,20 +197,19 @@ namespace TsMap2.Helper.Map {
         private long PrefabRender( Graphics g, PointF startPoint, PointF endPoint ) {
             long prefabStartTime = DateTime.Now.Ticks;
 
-            IEnumerable< TsMapPrefabItem > prefabs = _store.Map.Prefabs.Where( item =>
-                                                                                   item.X    >= startPoint.X - itemDrawMargin
-                                                                                   && item.X <= endPoint.X   + itemDrawMargin
-                                                                                   && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                   && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                                   && !item.Hidden )
-                                                           .ToList();
+            IEnumerable< ScsMapPrefabItem > prefabs = _store.Map.Prefabs.Where( item =>
+                                                                                    item.X    >= startPoint.X - itemDrawMargin
+                                                                                    && item.X <= endPoint.X   + itemDrawMargin
+                                                                                    && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                    && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                                    && !item.Hidden )
+                                                            .ToList();
 
             if ( !_renderFlags.IsActive( RenderFlags.Prefabs ) ) return DateTime.Now.Ticks - prefabStartTime;
 
-            var drawingQueue = new List< TsPrefabLook >();
+            var drawingQueue = new List< ScsPrefabLook >();
 
-            foreach ( TsMapPrefabItem prefabItem in prefabs ) {
-                // TsNode originNode = _store.Map.GetNodeByUid( prefabItem.Nodes[ 0 ] );
+            foreach ( ScsMapPrefabItem prefabItem in prefabs ) {
                 if ( prefabItem.Prefab.PrefabNodes == null ) continue;
 
                 /*if ( !prefabItem.HasLooks() ) {
@@ -324,7 +323,7 @@ namespace TsMap2.Helper.Map {
                                                                       ( Common.LaneWidth * mapPointLaneCount + mapPoint.LaneOffset ) / 2f, roadYaw - Math.PI / 2 );
                             cornerCoords.Add( ScsRenderHelper.RotatePoint( coords.X, coords.Y, rot, originNode.X, originNode.Z ) );
 
-                            TsPrefabLook prefabLook = new TsPrefabPolyLook( cornerCoords ) {
+                            ScsPrefabLook prefabLook = new TsPrefabPolyLook( cornerCoords ) {
                                 Color  = _palette.PrefabRoad,
                                 ZIndex = 4
                             };
@@ -338,8 +337,8 @@ namespace TsMap2.Helper.Map {
                 // prefabItem.GetLooks().ForEach( x => drawingQueue.Add( x ) );
             }
 
-            // foreach ( TsPrefabLook prefabLook in drawingQueue.OrderBy( p => p.ZIndex ) ) prefabLook.Draw( g );
-            foreach ( TsPrefabLook prefabLook in drawingQueue.OrderBy( p => p.ZIndex ) )
+            // foreach ( ScsPrefabLook prefabLook in drawingQueue.OrderBy( p => p.ZIndex ) ) prefabLook.Draw( g );
+            foreach ( ScsPrefabLook prefabLook in drawingQueue.OrderBy( p => p.ZIndex ) )
                 g.FillPolygon( prefabLook.Color, prefabLook.Points.ToArray() );
 
             return DateTime.Now.Ticks - prefabStartTime;
@@ -349,15 +348,15 @@ namespace TsMap2.Helper.Map {
             long mapOverlayStartTime = DateTime.Now.Ticks;
             if ( !_renderFlags.IsActive( RenderFlags.MapOverlays ) ) return DateTime.Now.Ticks - mapOverlayStartTime;
 
-            IEnumerable< TsMapMapOverlayItem > overlays = _store.Map.MapOverlays.Where( item =>
-                                                                                            item.X    >= startPoint.X - itemDrawMargin
-                                                                                            && item.X <= endPoint.X   + itemDrawMargin
-                                                                                            && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                            && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                                            && !item.Hidden )
-                                                                .ToList();
+            IEnumerable< ScsMapMapOverlayItem > overlays = _store.Map.MapOverlays.Where( item =>
+                                                                                             item.X    >= startPoint.X - itemDrawMargin
+                                                                                             && item.X <= endPoint.X   + itemDrawMargin
+                                                                                             && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                             && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                                             && !item.Hidden )
+                                                                 .ToList();
 
-            foreach ( TsMapMapOverlayItem overlayItem in overlays ) // TODO: Scaling
+            foreach ( ScsMapMapOverlayItem overlayItem in overlays ) // TODO: Scaling
             {
                 Bitmap b = overlayItem.Overlay.GetBitmap();
                 if ( b != null )
@@ -369,30 +368,30 @@ namespace TsMap2.Helper.Map {
 
         private long MapOverlays2Render( Graphics g, PointF startPoint, PointF endPoint ) {
             long mapOverlay2StartTime = DateTime.Now.Ticks;
-            IEnumerable< TsMapPrefabItem > prefabs = _store.Map.Prefabs.Where( item =>
-                                                                                   item.X    >= startPoint.X - itemDrawMargin
-                                                                                   && item.X <= endPoint.X   + itemDrawMargin
-                                                                                   && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                   && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                                   && !item.Hidden )
-                                                           .ToList();
+            IEnumerable< ScsMapPrefabItem > prefabs = _store.Map.Prefabs.Where( item =>
+                                                                                    item.X    >= startPoint.X - itemDrawMargin
+                                                                                    && item.X <= endPoint.X   + itemDrawMargin
+                                                                                    && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                    && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                                    && !item.Hidden )
+                                                            .ToList();
 
             if ( _renderFlags.IsActive( RenderFlags.MapOverlays ) ) {
-                IEnumerable< TsMapCompanyItem > companies = _store.Map.Companies.Where( item =>
-                                                                                            item.X    >= startPoint.X - itemDrawMargin
-                                                                                            && item.X <= endPoint.X   + itemDrawMargin
-                                                                                            && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                            && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                                            && !item.Hidden )
-                                                                  .ToList();
+                IEnumerable< ScsMapCompanyItem > companies = _store.Map.Companies.Where( item =>
+                                                                                             item.X    >= startPoint.X - itemDrawMargin
+                                                                                             && item.X <= endPoint.X   + itemDrawMargin
+                                                                                             && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                             && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                                             && !item.Hidden )
+                                                                   .ToList();
 
-                foreach ( TsMapCompanyItem companyItem in companies ) // TODO: Scaling
+                foreach ( ScsMapCompanyItem companyItem in companies ) // TODO: Scaling
                 {
                     // var point = new PointF( companyItem.X, companyItem.Z );
                     // if ( companyItem.Nodes.Count > 0 ) {
-                    //     TsMapPrefabItem prefab = _store.Map.Prefabs.FirstOrDefault( x => x.Uid == companyItem.Nodes[ 0 ] );
+                    //     ScsMapPrefabItem prefab = _store.Map.Prefabs.FirstOrDefault( x => x.Uid == companyItem.Nodes[ 0 ] );
                     //     if ( prefab != null ) {
-                    //         TsNode originNode = _store.Map.GetNodeByUid( prefab.Nodes[ 0 ] );
+                    //         ScsNode originNode = _store.Map.GetNodeByUid( prefab.Nodes[ 0 ] );
                     //         if ( prefab.Prefab.PrefabNodes == null ) continue;
                     //         TsPrefabNode mapPointOrigin = prefab.Prefab.PrefabNodes[ prefab.Origin ];
                     //
@@ -416,9 +415,9 @@ namespace TsMap2.Helper.Map {
                         g.DrawImage( b, companyItem.Position.X, companyItem.Position.Y, b.Width, b.Height );
                 }
 
-                foreach ( TsMapPrefabItem prefab in prefabs ) // Draw all prefab overlays
+                foreach ( ScsMapPrefabItem prefab in prefabs ) // Draw all prefab overlays
                 {
-                    TsNode originNode = _store.Map.GetNodeByUid( prefab.Nodes[ 0 ] );
+                    ScsNode originNode = _store.Map.GetNodeByUid( prefab.Nodes[ 0 ] );
                     if ( prefab.Prefab.PrefabNodes == null ) continue;
                     TsPrefabNode mapPointOrigin = prefab.Prefab.PrefabNodes[ prefab.Origin ];
 
@@ -434,32 +433,32 @@ namespace TsMap2.Helper.Map {
 
                         switch ( spawnPoint.Type ) {
                             case TsSpawnPointType.GasPos: {
-                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "gas_ico" ) );
+                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "gas_ico" ) );
                                 b = overlay?.GetBitmap();
                                 break;
                             }
                             case TsSpawnPointType.ServicePos: {
-                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "service_ico" ) );
+                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "service_ico" ) );
                                 b = overlay?.GetBitmap();
                                 break;
                             }
                             case TsSpawnPointType.WeightStationPos: {
-                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "weigh_station_ico" ) );
+                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "weigh_station_ico" ) );
                                 b = overlay?.GetBitmap();
                                 break;
                             }
                             case TsSpawnPointType.TruckDealerPos: {
-                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "dealer_ico" ) );
+                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "dealer_ico" ) );
                                 b = overlay?.GetBitmap();
                                 break;
                             }
                             case TsSpawnPointType.BuyPos: {
-                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "garage_large_ico" ) );
+                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "garage_large_ico" ) );
                                 b = overlay?.GetBitmap();
                                 break;
                             }
                             case TsSpawnPointType.RecruitmentPos: {
-                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "recruitment_ico" ) );
+                                TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "recruitment_ico" ) );
                                 b = overlay?.GetBitmap();
                                 break;
                             }
@@ -479,9 +478,9 @@ namespace TsMap2.Helper.Map {
                         if ( triggerPoint.TriggerId == lastId ) continue;
                         lastId = (int)triggerPoint.TriggerId;
 
-                        if ( triggerPoint.TriggerActionToken == ScsHashHelper.StringToToken( "hud_parking" ) ) // parking trigger
+                        if ( triggerPoint.TriggerActionToken == ScsTokenHelper.StringToToken( "hud_parking" ) ) // parking trigger
                         {
-                            TsMapOverlay overlay = _store.Def.LookupOverlay( ScsHashHelper.StringToToken( "parking_ico" ) );
+                            TsMapOverlay overlay = _store.Def.LookupOverlay( ScsTokenHelper.StringToToken( "parking_ico" ) );
                             Bitmap       b       = overlay?.GetBitmap();
 
                             if ( b != null )
@@ -491,15 +490,15 @@ namespace TsMap2.Helper.Map {
                     }
                 }
 
-                List< TsMapTriggerItem > triggers = _store.Map.Triggers.Where( item =>
-                                                                                   item.X    >= startPoint.X - itemDrawMargin
-                                                                                   && item.X <= endPoint.X   + itemDrawMargin
-                                                                                   && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                   && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                                   && !item.Hidden )
-                                                          .ToList();
+                List< ScsMapTriggerItem > triggers = _store.Map.Triggers.Where( item =>
+                                                                                    item.X    >= startPoint.X - itemDrawMargin
+                                                                                    && item.X <= endPoint.X   + itemDrawMargin
+                                                                                    && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                    && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                                    && !item.Hidden )
+                                                           .ToList();
 
-                foreach ( TsMapTriggerItem triggerItem in triggers ) // TODO: Scaling
+                foreach ( ScsMapTriggerItem triggerItem in triggers ) // TODO: Scaling
                 {
                     Bitmap b = triggerItem.Overlay?.GetBitmap();
                     if ( b != null )
@@ -507,14 +506,14 @@ namespace TsMap2.Helper.Map {
                         g.DrawImage( b, triggerItem.X, triggerItem.Z, b.Width, b.Height );
                 }
 
-                List< TsMapFerryItem > ferryItems = _store.Map.FerryConnections.Where( item =>
-                                                                                           item.X    >= startPoint.X - itemDrawMargin
-                                                                                           && item.X <= endPoint.X   + itemDrawMargin
-                                                                                           && item.Z >= startPoint.Y - itemDrawMargin
-                                                                                           && item.Z <= endPoint.Y   + itemDrawMargin )
-                                                          .ToList();
+                List< ScsMapFerryItem > ferryItems = _store.Map.FerryConnections.Where( item =>
+                                                                                            item.X    >= startPoint.X - itemDrawMargin
+                                                                                            && item.X <= endPoint.X   + itemDrawMargin
+                                                                                            && item.Z >= startPoint.Y - itemDrawMargin
+                                                                                            && item.Z <= endPoint.Y   + itemDrawMargin )
+                                                           .ToList();
 
-                foreach ( TsMapFerryItem ferryItem in ferryItems ) // TODO: Scaling
+                foreach ( ScsMapFerryItem ferryItem in ferryItems ) // TODO: Scaling
                 {
                     Bitmap b = ferryItem.Overlay?.GetBitmap();
                     if ( b != null )
@@ -540,7 +539,7 @@ namespace TsMap2.Helper.Map {
                 TsCity city = kv.Value;
                 string name = city.GetLocalizedName( _store.Settings.SelectedLocalization );
 
-                // TsNode node = _store.Map.GetNodeByUid( item.NodeUid );
+                // ScsNode node = _store.Map.GetNodeByUid( item.NodeUid );
                 // PointF coords = node == null
                 // ? new PointF( item.X, item.Z )
                 // : new PointF( node.X, node.Z );
@@ -560,21 +559,25 @@ namespace TsMap2.Helper.Map {
             return DateTime.Now.Ticks - cityStartTime;
         }
 
-        private long RoadRender( Graphics g, PointF startPoint, PointF endPoint ) {
+        private long RoadRender( Graphics g, PointF startPoint, PointF endPoint, float scale ) {
             long roadStartTime = DateTime.Now.Ticks;
+            int  zoomIndex     = ScsRenderHelper.GetZoomIndex( _clip, scale );
+
             if ( !_renderFlags.IsActive( RenderFlags.Roads ) ) return DateTime.Now.Ticks - roadStartTime;
 
-            IEnumerable< TsMapRoadItem > roads = _store.Map.Roads.Where( item =>
-                                                                             item.X    >= startPoint.X - itemDrawMargin
-                                                                             && item.X <= endPoint.X   + itemDrawMargin
-                                                                             && item.Z >= startPoint.Y - itemDrawMargin
-                                                                             && item.Z <= endPoint.Y   + itemDrawMargin
-                                                                        /*&& !item.Hidden*/ )
-                                                       .ToList();
+            IEnumerable< ScsMapRoadItem > roads = _store.Map.Roads.Where( item =>
+                                                                              item.X    >= startPoint.X - itemDrawMargin
+                                                                              && item.X <= endPoint.X   + itemDrawMargin
+                                                                              && item.Z >= startPoint.Y - itemDrawMargin
+                                                                              && item.Z <= endPoint.Y   + itemDrawMargin
+                                                                         /*&& !item.Hidden*/ )
+                                                        .ToList();
 
-            foreach ( TsMapRoadItem road in roads ) {
-                // TsNode startNode = road.GetStartNode();
-                // TsNode endNode   = road.GetEndNode();
+            foreach ( ScsMapRoadItem road in roads ) {
+                // if ( road.IsSecret ) continue;
+
+                // ScsNode startNode = road.GetStartNode();
+                // ScsNode endNode   = road.GetEndNode();
 
                 /*if ( !road.HasPoints() ) {
                     var newPoints = new List< PointF >();
@@ -604,7 +607,10 @@ namespace TsMap2.Helper.Map {
                 // if ( road.GetPoints().Length <= 0 ) continue;
 
                 float roadWidth = road.RoadLook.GetWidth();
-                var   roadPen   = new Pen( _palette.Road, roadWidth );
+                Pen roadPen = road.IsSecret && zoomIndex < 3
+                                  ? new Pen( _palette.Road, roadWidth ) { DashPattern = new[] { 1f, 1f } }
+                                  : new Pen( _palette.Road, roadWidth );
+
                 g.DrawCurve( roadPen, road.GetPoints().ToArray() );
                 roadPen.Dispose();
             }

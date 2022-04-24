@@ -1,8 +1,7 @@
 ﻿using TsMap2.Helper;
-using TsMap2.Model.TsMapItem;
 
 namespace TsMap2.Scs.FileSystem.Map {
-    public class ScsMapCutPlaneItem : TsMapItem {
+    public class ScsMapCutPlaneItem : ScsMapItem {
         public ScsMapCutPlaneItem( ScsSector sector ) : base( sector, sector.LastOffset ) {
             Valid = false;
             TsCutPlaneItem825();

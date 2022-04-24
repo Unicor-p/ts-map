@@ -3,34 +3,34 @@ using System.Reflection;
 using System.Text;
 using TsMap2.Exceptions;
 using TsMap2.Helper;
-using TsMap2.Model;
+using TsMap2.Model.Ts;
 
 namespace TsMap2.Scs.FileSystem.Entry {
     public class ScsCityEntry : AbstractScsEntry< TsCity > {
         public Dictionary< ulong, TsCity > List() {
-            VerifyRfs();
-
-            ScsDirectory defDirectory = Store.Rfs.GetDirectory( ScsPath.Def.DefFolderName );
+            UberDirectory defDirectory = Store.Ubs.GetDirectory( ScsPath.Def.DefFolderName );
             if ( defDirectory == null ) {
                 var message = $"[{MethodBase.GetCurrentMethod()?.Name}] Could not read '{ScsPath.Def.DefFolderName}' dir";
                 throw new ScsEntryException( message );
             }
 
-            List< ScsFile > cityFiles = defDirectory.GetFiles( ScsPath.Def.CityFileName );
-            if ( cityFiles == null ) {
+            List< string > cityFilesName = defDirectory.GetFiles( ScsPath.Def.CityFileName );
+            if ( cityFilesName == null ) {
                 var message = $"[{MethodBase.GetCurrentMethod()?.Name}] Could not read {ScsPath.Def.CityFileName} files";
                 throw new ScsEntryException( message );
             }
 
             var cities = new Dictionary< ulong, TsCity >();
-            foreach ( ScsFile cityFile in cityFiles ) {
+            foreach ( string cityFileName in cityFilesName ) {
+                UberFile cityFile = UberFileSystem.Instance.GetFile( $"def/{cityFileName}" );
+
                 byte[]   data  = cityFile.Entry.Read();
                 string[] lines = Encoding.UTF8.GetString( data ).Split( '\n' );
                 foreach ( string line in lines ) {
                     if ( line.TrimStart().StartsWith( "#" ) ) continue;
                     if ( !line.Contains( "@include" ) ) continue;
 
-                    string path = ScsHelper.GetFilePath( line.Split( '"' )[ 1 ], "def" );
+                    string path = PathHelper.GetFilePath( line.Split( '"' )[ 1 ], "def" );
                     TsCity city = Get( path );
 
                     if ( city != null && city.Token != 0 && !cities.ContainsKey( city.Token ) )
@@ -56,7 +56,7 @@ namespace TsMap2.Scs.FileSystem.Entry {
                 if ( !validLine ) continue;
 
                 if ( key == "city_data" )
-                    token = ScsHashHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 1 ] ) );
+                    token = ScsTokenHelper.StringToToken( ScsSiiHelper.Trim( value.Split( '.' )[ 1 ] ) );
                 else if ( key == "city_name" )
                     name = line.Split( '"' )[ 1 ];
                 else if ( key == "city_name_localized" )

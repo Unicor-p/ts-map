@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Serilog;
-using TsMap2.Model;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Model.Ts;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Job.Builder {
     public class BuilderRoadsJob : ThreadJob {
         protected override void Do() {
             Log.Debug( "[Job][Builder][Road] Building" );
 
-            foreach ( TsMapRoadItem road in Store().Map.Roads ) {
-                TsNode startNode = road.GetStartNode();
-                TsNode endNode   = road.GetEndNode();
+            foreach ( ScsMapRoadItem road in Store().Map.Roads ) {
+                ScsNode startNode = road.GetStartNode();
+                ScsNode endNode   = road.GetEndNode();
 
                 var newPoints = new List< PointF >();
 

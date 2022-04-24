@@ -2,32 +2,32 @@ using System;
 using System.Drawing;
 using Serilog;
 using TsMap2.Helper;
-using TsMap2.Model;
-using TsMap2.Model.TsMapItem;
+using TsMap2.Model.Ts;
 using TsMap2.Scs;
+using TsMap2.Scs.FileSystem.Map;
 
 namespace TsMap2.Job.Parse.Overlays {
     public class ParseOverlayPrefabJob : ThreadJob {
         protected override void Do() {
             Log.Information( "[Job][OverlayPrefab] Parsing..." );
 
-            foreach ( TsMapPrefabItem prefab in Store().Map.Prefabs ) {
+            foreach ( ScsMapPrefabItem prefab in Store().Map.Prefabs ) {
                 // Bitmap b          = prefab.Overlay?.GetBitmap();
-                TsNode originNode = Store().Map.GetNodeByUid( prefab.Nodes[ 0 ] );
+                ScsNode originNode = Store().Map.GetNodeByUid( prefab.Nodes[ 0 ] );
 
                 if ( !prefab.Valid || prefab.Hidden || prefab.Prefab.PrefabNodes == null ) continue;
 
                 TsPrefabNode mapPointOrigin = prefab.Prefab.PrefabNodes[ prefab.Origin ];
 
-                var rot = (float) ( originNode.Rotation
-                                    - Math.PI
-                                    - Math.Atan2( mapPointOrigin.RotZ, mapPointOrigin.RotX )
-                                    + Math.PI / 2 );
+                var rot = (float)( originNode.Rotation
+                                   - Math.PI
+                                   - Math.Atan2( mapPointOrigin.RotZ, mapPointOrigin.RotX )
+                                   + Math.PI / 2 );
 
                 float prefabStartX = originNode.X - mapPointOrigin.X;
                 float prefabStartZ = originNode.Z - mapPointOrigin.Z;
                 foreach ( TsSpawnPoint spawnPoint in prefab.Prefab.SpawnPoints ) {
-                    ParseTrigger( prefab, prefabStartX, prefabStartZ, rot, spawnPoint, originNode );
+                    ParseTrigger( prefab, prefabStartX, prefabStartZ, rot, originNode );
                     TsMapOverlayItem ov = GenerateMapItem( prefabStartX, prefabStartZ, rot, spawnPoint, originNode );
 
                     if ( ov != null )
@@ -46,7 +46,7 @@ namespace TsMap2.Job.Parse.Overlays {
             Log.Information( "[Job][OverlayPrefab] Recruitment: {0}",   Store().Map.Overlays.Recruitment.Count );
         }
 
-        private TsMapOverlayItem GenerateMapItem( float prefabStartX, float prefabStartZ, float rot, TsSpawnPoint spawnPoint, TsNode originNode ) {
+        private TsMapOverlayItem GenerateMapItem( float prefabStartX, float prefabStartZ, float rot, TsSpawnPoint spawnPoint, ScsNode originNode ) {
             PointF newPoint = ScsRenderHelper.RotatePoint( prefabStartX + spawnPoint.X,
                                                            prefabStartZ + spawnPoint.Z, rot,
                                                            originNode.X, originNode.Z );
@@ -89,7 +89,7 @@ namespace TsMap2.Job.Parse.Overlays {
                     return null;
             }
 
-            TsMapOverlay overlay = Store().Def.LookupOverlay( ScsHashHelper.StringToToken( overlayName ) );
+            TsMapOverlay overlay = Store().Def.GetOverlay( overlayName, ScsOverlayTypes.Map );
             Bitmap       b       = overlay.GetBitmap();
 
             return b == null
@@ -97,22 +97,22 @@ namespace TsMap2.Job.Parse.Overlays {
                        : new TsMapOverlayItem( newPoint.X, newPoint.Y, overlayName, type, b );
         }
 
-        private void ParseTrigger( TsMapPrefabItem prefab, float prefabStartX, float prefabStartZ, float rot, TsSpawnPoint spawnPoint, TsNode originNode ) {
+        private void ParseTrigger( ScsMapPrefabItem prefab, float prefabStartX, float prefabStartZ, float rot, ScsNode originNode ) {
             int lastId = -1;
             foreach ( TsTriggerPoint triggerPoint in prefab.Prefab.TriggerPoints ) {
-                TsMapOverlay overlay = Store().Def.LookupOverlay( ScsHashHelper.StringToToken( "parking_ico" ) );
+                TsMapOverlay overlay = Store().Def.GetOverlay( "parking_ico", ScsOverlayTypes.Map );
                 Bitmap       b       = overlay.GetBitmap();
 
                 if ( triggerPoint.TriggerId             == lastId
                      || b                               == null
-                     || triggerPoint.TriggerActionToken != ScsHashHelper.StringToToken( "hud_parking" ) ) continue;
+                     || triggerPoint.TriggerActionToken != ScsTokenHelper.StringToToken( "hud_parking" ) ) continue;
 
 
                 PointF newPoint = ScsRenderHelper.RotatePoint( prefabStartX + triggerPoint.X,
                                                                prefabStartZ + triggerPoint.Z, rot,
                                                                originNode.X, originNode.Z );
 
-                lastId = (int) triggerPoint.TriggerId;
+                lastId = (int)triggerPoint.TriggerId;
                 var ov = new TsMapOverlayItem( newPoint.X, newPoint.Y, "parking_ico", TsMapOverlayType.Parking, b );
                 Store().Map.Overlays.Parking.Add( ov );
 

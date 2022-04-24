@@ -21,12 +21,12 @@ namespace TsMap2.Helper {
         }
 
         public static void SaveRawFile( RawType type, string fileName, byte[] stream ) {
-            ScsFile file = StoreHelper.Instance.Rfs.GetFileEntry( fileName );
+            UberFile file = StoreHelper.Instance.Ubs.GetFile( fileName );
 
             if ( file != null ) {
                 byte[] fileContent = file.Entry.Read();
                 var    rawFactory  = new RawFactory( fileContent );
-                rawFactory.Save( type, file.GetFullName() );
+                rawFactory.Save( type, file.Path );
             }
         }
 

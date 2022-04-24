@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using Serilog;
 using TsMap2.Helper;
-using TsMap2.Model.TsMapItem;
 
 namespace TsMap2.Scs.FileSystem.Map {
-    public class ScsMapGarageItem : TsMapItem {
+    public class ScsMapGarageItem : ScsMapItem {
         public ScsMapGarageItem( ScsSector sector ) : base( sector, sector.LastOffset ) {
             Valid = false;
             // int fileOffset = Sector.LastOffset + 0x34; // Set position at start of flags
@@ -13,7 +12,8 @@ namespace TsMap2.Scs.FileSystem.Map {
             else if ( Sector.Version >= 855 )
                 TsGarageItem855();
             else
-                Log.Warning( $"Unknown base file version ({Sector.Version}) for item {Type} in file '{Path.GetFileName( Sector.FilePath )}' @ {Sector.LastOffset}." );
+                Log.Error( $"Unknown base file version ({Sector.Version}) for item {Type} "
+                           + $"in file '{Path.GetFileName( Sector.FilePath )}' @ {Sector.LastOffset} from '{Sector.ArchivePath}'" );
         }
 
         private void TsGarageItem825() {

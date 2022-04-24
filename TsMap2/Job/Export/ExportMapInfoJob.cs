@@ -2,7 +2,7 @@
 using Serilog;
 using TsMap2.Factory.Json;
 using TsMap2.Helper.Map;
-using TsMap2.Model.TsMapInfo;
+using TsMap2.Model.Ts.MapInfo;
 
 namespace TsMap2.Job.Export {
     public class ExportMapInfoJob : ThreadJob {
