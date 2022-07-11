@@ -33,8 +33,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,55 +47,60 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-      <Compile Include="Common\Consts.cs"/>
-      <Compile Include="Common\Enums.cs"/>
-      <Compile Include="FileSystem\CityHash.cs"/>
-      <Compile Include="FileSystem\Entry.cs"/>
-      <Compile Include="FileSystem\Hash\HashEntry.cs"/>
-      <Compile Include="FileSystem\Hash\HashArchiveHeader.cs"/>
-      <Compile Include="FileSystem\ArchiveFile.cs"/>
-      <Compile Include="FileSystem\Zip\ZipEntry.cs"/>
-      <Compile Include="LocalizationManager.cs"/>
-      <Compile Include="Helpers\Logger\LogLevel.cs"/>
-      <Compile Include="Helpers\MemoryHelper.cs"/>
-      <Compile Include="FileSystem\Hash\HashArchiveFile.cs"/>
-      <Compile Include="FileSystem\Zip\ZipArchiveFile.cs"/>
-      <Compile Include="FileSystem\UberDirectory.cs"/>
-      <Compile Include="FileSystem\UberFile.cs"/>
-      <Compile Include="FileSystem\UberFileSystem.cs"/>
-      <Compile Include="Helpers\Logger\Logger.cs"/>
-      <Compile Include="Helpers\Logger\LogLine.cs"/>
-      <Compile Include="Helpers\PathHelper.cs"/>
-      <Compile Include="Common\ScsToken.cs"/>
-      <Compile Include="JsonHelper.cs"/>
-      <Compile Include="MapPalette.cs"/>
-      <Compile Include="Properties\AssemblyInfo.cs"/>
-      <Compile Include="Helper.cs"/>
-      <Compile Include="Settings.cs"/>
-      <Compile Include="TsCity.cs"/>
-      <Compile Include="TsCountry.cs"/>
-      <Compile Include="TsFerryConnection.cs"/>
-      <Compile Include="TsItem\TsBusStopItem.cs"/>
-      <Compile Include="TsItem\TsCityItem.cs"/>
-      <Compile Include="TsItem\TsCompanyItem.cs"/>
-      <Compile Include="TsItem\TsCutPlaneItem.cs"/>
-      <Compile Include="TsItem\TsCutsceneItem.cs"/>
-      <Compile Include="TsItem\TsFerryItem.cs"/>
-      <Compile Include="TsItem\TsFuelPumpItem.cs"/>
-      <Compile Include="TsItem\TsGarageItem.cs"/>
-      <Compile Include="TsItem\TsItem.cs"/>
-      <Compile Include="TsItem\TsMapAreaItem.cs"/>
-      <Compile Include="TsItem\TsMapOverlayItem.cs"/>
-      <Compile Include="TsItem\TsPrefabItem.cs"/>
+    <Compile Include="Common\Consts.cs" />
+    <Compile Include="Common\DlcGuard.cs" />
+    <Compile Include="FileSystem\CityHash.cs" />
+    <Compile Include="FileSystem\Entry.cs" />
+    <Compile Include="FileSystem\Hash\HashEntry.cs" />
+    <Compile Include="FileSystem\Hash\HashArchiveHeader.cs" />
+    <Compile Include="FileSystem\ArchiveFile.cs" />
+    <Compile Include="FileSystem\Zip\ZipEntry.cs" />
+    <Compile Include="LocalizationManager.cs" />
+    <Compile Include="Helpers\Logger\LogLevel.cs" />
+    <Compile Include="Helpers\MemoryHelper.cs" />
+    <Compile Include="FileSystem\Hash\HashArchiveFile.cs" />
+    <Compile Include="FileSystem\Zip\ZipArchiveFile.cs" />
+    <Compile Include="FileSystem\UberDirectory.cs" />
+    <Compile Include="FileSystem\UberFile.cs" />
+    <Compile Include="FileSystem\UberFileSystem.cs" />
+    <Compile Include="Helpers\Logger\Logger.cs" />
+    <Compile Include="Helpers\Logger\LogLine.cs" />
+    <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Common\ScsToken.cs" />
+    <Compile Include="JsonHelper.cs" />
+    <Compile Include="MapPalette.cs" />
+    <Compile Include="Map\Overlays\ColorTypes.cs" />
+    <Compile Include="Map\Overlays\MapOverlay.cs" />
+    <Compile Include="Map\Overlays\MapOverlayManager.cs" />
+    <Compile Include="Map\Overlays\OverlayImage.cs" />
+    <Compile Include="Map\Overlays\OverlayType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="TsCity.cs" />
+    <Compile Include="TsCountry.cs" />
+    <Compile Include="TsFerryConnection.cs" />
+    <Compile Include="TsItem\TsModelItem.cs" />
+    <Compile Include="TsItem\TsBusStopItem.cs" />
+    <Compile Include="TsItem\TsCityItem.cs" />
+    <Compile Include="TsItem\TsCompanyItem.cs" />
+    <Compile Include="TsItem\TsCutPlaneItem.cs" />
+    <Compile Include="TsItem\TsCutsceneItem.cs" />
+    <Compile Include="TsItem\TsFerryItem.cs" />
+    <Compile Include="TsItem\TsFuelPumpItem.cs" />
+    <Compile Include="TsItem\TsGarageItem.cs" />
+    <Compile Include="TsItem\TsItem.cs" />
+    <Compile Include="TsItem\TsMapAreaItem.cs" />
+    <Compile Include="TsItem\TsMapOverlayItem.cs" />
+    <Compile Include="TsItem\TsPrefabItem.cs" />
     <Compile Include="TsItem\TsRoadItem.cs" />
     <Compile Include="TsItem\TsRoadSideItem.cs" />
     <Compile Include="TsItem\TsServiceItem.cs" />
     <Compile Include="TsItem\TsTrafficRuleItem.cs" />
     <Compile Include="TsItem\TsTrajectoryItem.cs" />
     <Compile Include="TsItem\TsTriggerItem.cs" />
-      <Compile Include="TsItem\TsVisibilityAreaItem.cs"/>
+    <Compile Include="TsItem\TsVisibilityAreaItem.cs" />
     <Compile Include="TsTypes.cs" />
-    <Compile Include="TsMapOverlay.cs" />
     <Compile Include="TsMapper.cs" />
     <Compile Include="TsMapRenderer.cs" />
     <Compile Include="TsNode.cs" />
@@ -107,6 +112,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-    <ItemGroup/>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

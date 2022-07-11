@@ -26,18 +26,24 @@ namespace TsMap.TsItem
         public float Z { get; }
         public bool Hidden { get; protected set; }
 
+        protected uint Flags { get; }
+
+        public byte DlcGuard = 0;
+
         public TsItem(TsSector sector, int offset)
         {
             Sector = sector;
 
             var fileOffset = offset;
 
-            Type = (TsItemType)MemoryHelper.ReadUInt32(Sector.Stream, fileOffset);
+            Type = (TsItemType) MemoryHelper.ReadUInt32(Sector.Stream, fileOffset);
 
             Uid = MemoryHelper.ReadUInt64(Sector.Stream, fileOffset += 0x04);
 
             X = MemoryHelper.ReadSingle(Sector.Stream, fileOffset += 0x08);
             Z = MemoryHelper.ReadSingle(Sector.Stream, fileOffset += 0x08);
+
+            Flags = MemoryHelper.ReadUInt32(Sector.Stream, fileOffset += 0x20);
         }
 
         public TsNode GetStartNode()
@@ -50,5 +56,8 @@ namespace TsMap.TsItem
             return EndNode ?? (EndNode = Sector.Mapper.GetNodeByUid(EndNodeUid));
         }
 
+        internal virtual void Update()
+        {
+        }
     }
 }
