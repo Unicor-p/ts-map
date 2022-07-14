@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class ItemVisibilityForm
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+             this.StartPosition            = FormStartPosition.CenterScreen;
             this.CityNamesCheckBox = new System.Windows.Forms.CheckBox();
             this.MapAreasCheckBox = new System.Windows.Forms.CheckBox();
             this.FerryConnectionsCheckBox = new System.Windows.Forms.CheckBox();

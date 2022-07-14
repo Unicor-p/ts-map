@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class TileMapGeneratorForm
     {
@@ -26,8 +28,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Generate TileMap Info");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Localized Names");
@@ -57,6 +58,8 @@
             this.SecretRoadsCheckBox = new System.Windows.Forms.CheckBox();
             this.GenTilesCheck = new System.Windows.Forms.CheckBox();
             this.triStateTreeView1 = new TsMap.Canvas.TriStateTreeView();
+             this.mapInfoType              = new System.Windows.Forms.ComboBox();
+            this.mapInfoExportTypeLabel   = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.StartZoomLevelBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.EndZoomLevelBox)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -64,7 +67,7 @@
             // 
             // GenerateBtn
             // 
-            this.GenerateBtn.Location = new System.Drawing.Point(10, 214);
+            this.GenerateBtn.Location = new System.Drawing.Point(13, 271);
             this.GenerateBtn.Name = "GenerateBtn";
             this.GenerateBtn.Size = new System.Drawing.Size(322, 23);
             this.GenerateBtn.TabIndex = 2;
@@ -75,7 +78,7 @@
             // StartLabel
             // 
             this.StartLabel.AutoSize = true;
-            this.StartLabel.Location = new System.Drawing.Point(7, 35);
+            this.StartLabel.Location = new System.Drawing.Point(12, 92 );
             this.StartLabel.Name = "StartLabel";
             this.StartLabel.Size = new System.Drawing.Size(29, 13);
             this.StartLabel.TabIndex = 4;
@@ -84,7 +87,7 @@
             // EndLabel
             // 
             this.EndLabel.AutoSize = true;
-            this.EndLabel.Location = new System.Drawing.Point(97, 35);
+            this.EndLabel.Location = new System.Drawing.Point(100, 92);
             this.EndLabel.Name = "EndLabel";
             this.EndLabel.Size = new System.Drawing.Size(26, 13);
             this.EndLabel.TabIndex = 4;
@@ -92,7 +95,7 @@
             // 
             // StartZoomLevelBox
             // 
-            this.StartZoomLevelBox.Location = new System.Drawing.Point(44, 33);
+            this.StartZoomLevelBox.Location = new System.Drawing.Point(47, 90);
             this.StartZoomLevelBox.Maximum = new decimal(new int[] {
             18,
             0,
@@ -104,7 +107,7 @@
             // 
             // EndZoomLevelBox
             // 
-            this.EndZoomLevelBox.Location = new System.Drawing.Point(131, 33);
+            this.EndZoomLevelBox.Location = new System.Drawing.Point(134, 90);
             this.EndZoomLevelBox.Maximum = new decimal(new int[] {
             18,
             0,
@@ -202,7 +205,7 @@
             this.groupBox1.Controls.Add(this.SecretRoadsCheckBox);
             this.groupBox1.Controls.Add(this.RoadsCheckBox);
             this.groupBox1.Controls.Add(this.FerryConnectionsCheckBox);
-            this.groupBox1.Location = new System.Drawing.Point(183, 7);
+            this.groupBox1.Location = new System.Drawing.Point(186, 64 );
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(149, 201);
             this.groupBox1.TabIndex = 12;
@@ -239,7 +242,7 @@
             this.GenTilesCheck.AutoSize = true;
             this.GenTilesCheck.Checked = true;
             this.GenTilesCheck.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.GenTilesCheck.Location = new System.Drawing.Point(10, 12);
+            this.GenTilesCheck.Location = new System.Drawing.Point(13, 69);
             this.GenTilesCheck.Name = "GenTilesCheck";
             this.GenTilesCheck.Size = new System.Drawing.Size(95, 17);
             this.GenTilesCheck.TabIndex = 5;
@@ -249,7 +252,7 @@
             // 
             // triStateTreeView1
             // 
-            this.triStateTreeView1.Location = new System.Drawing.Point(10, 59);
+            this.triStateTreeView1.Location = new System.Drawing.Point(13, 116);
             this.triStateTreeView1.Name = "triStateTreeView1";
             treeNode1.Checked = true;
             treeNode1.Name = "GenTileMapInfo";
@@ -281,11 +284,30 @@
             this.triStateTreeView1.Size = new System.Drawing.Size(166, 149);
             this.triStateTreeView1.TabIndex = 13;
             // 
+            // mapInfoType
+            // 
+            this.mapInfoType.FormattingEnabled = true;
+            this.mapInfoType.Items.AddRange( new object[] { "default", "jagfx" } );
+            this.mapInfoType.Location = new System.Drawing.Point( 12, 29 );
+            this.mapInfoType.Name     = "mapInfoType";
+            this.mapInfoType.Size     = new System.Drawing.Size( 323, 21 );
+            this.mapInfoType.TabIndex = 14;
+            // 
+            // mapInfoExportTypeLabel
+            // 
+            this.mapInfoExportTypeLabel.Location =  new System.Drawing.Point( 12, 9 );
+            this.mapInfoExportTypeLabel.Name     =  "mapInfoExportTypeLabel";
+            this.mapInfoExportTypeLabel.Size     =  new System.Drawing.Size( 100, 17 );
+            this.mapInfoExportTypeLabel.TabIndex =  15;
+            this.mapInfoExportTypeLabel.Text     =  "Export for ...";
+            // 
             // TileMapGeneratorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(337, 244);
+            this.ClientSize = new System.Drawing.Size( 348, 304 );
+            this.Controls.Add( this.mapInfoExportTypeLabel );
+            this.Controls.Add( this.mapInfoType );
             this.Controls.Add(this.triStateTreeView1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.GenTilesCheck);
@@ -298,6 +320,7 @@
             this.MinimizeBox = false;
             this.Name = "TileMapGeneratorForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Export as Web Tile Map";
             ((System.ComponentModel.ISupportInitialize)(this.StartZoomLevelBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.EndZoomLevelBox)).EndInit();
@@ -305,8 +328,11 @@
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
+
+        private System.Windows.Forms.Label mapInfoExportTypeLabel;
+
+        private System.Windows.Forms.ComboBox mapInfoType;
 
         #endregion
 
@@ -325,7 +351,7 @@
         private System.Windows.Forms.CheckBox PrefabsCheckBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox GenTilesCheck;
-        private TriStateTreeView triStateTreeView1;
+        private TsMap.Canvas.TriStateTreeView triStateTreeView1;
         private System.Windows.Forms.CheckBox SecretRoadsCheckBox;
         private System.Windows.Forms.CheckBox BusStopOverlayCheckBox;
     }

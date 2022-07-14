@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class SetupForm
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.StartPosition           = FormStartPosition.CenterScreen;
             this.GameFolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.NextBtn = new System.Windows.Forms.Button();
             this.loadMods = new System.Windows.Forms.CheckBox();
@@ -233,7 +236,6 @@
             this.modPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class TsMapCanvas
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.StartPosition                         = FormStartPosition.CenterScreen;
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GenerateTileMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();

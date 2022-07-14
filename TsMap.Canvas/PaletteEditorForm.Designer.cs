@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class PaletteEditorForm
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.StartPosition = FormStartPosition.CenterScreen;
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 

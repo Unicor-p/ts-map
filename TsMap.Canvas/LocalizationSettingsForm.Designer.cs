@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class LocalizationSettingsForm
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.StartPosition         = FormStartPosition.CenterScreen;
             this.SubmitBtn = new System.Windows.Forms.Button();
             this.localizationComboBox1 = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();

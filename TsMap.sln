@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TsMap.Canvas", "TsMap.Canva
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TsMap2", "TsMap2\TsMap2.csproj", "{874795BA-A24F-4809-A54F-E86AC8A7100F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TsMap2.UI", "TsMap2.UI\TsMap2.UI.csproj", "{65DB856A-1FBD-4ADF-A9EE-BFCF323F5A9F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

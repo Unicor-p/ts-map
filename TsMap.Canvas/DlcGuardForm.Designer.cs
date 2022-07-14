@@ -1,4 +1,6 @@
-﻿namespace TsMap.Canvas
+﻿using System.Windows.Forms;
+
+namespace TsMap.Canvas
 {
     partial class DlcGuardForm
     {
@@ -28,6 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.StartPosition          = FormStartPosition.CenterScreen;
             this.DlcGuardCheckedListBox = new System.Windows.Forms.CheckedListBox();
             this.SuspendLayout();
             // 
