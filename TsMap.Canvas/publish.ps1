@@ -2,6 +2,7 @@
 
 #Get the version from the csproj file
 $project =  "TsMap.Canvas"
+$finalExeName = "TsMap"
 $workingDirectory = Get-Location
 $xml = [Xml] (Get-Content $workingDirectory\$project\$project.csproj)
 
@@ -31,4 +32,7 @@ Remove-Item "$publishDirectory*"
 dotnet build TsMap.Canvas -f net47 -r win-x64 -c Publish
 Start-Sleep -s 1
 
-Rename-Item "$publishDirectory$project.exe" "$publishDirectory$project-$finalBuildVersion.exe"
+Rename-Item "$publishDirectory$project.exe" "$publishDirectory$finalExeName-$finalBuildVersion.exe"
+
+Get-ChildItem -Path "$publishDirectory*.dll" | Compress-Archive -DestinationPath "$publishDirectory$finalExeName-$finalBuildVersion.zip" -CompressionLevel "Fastest"
+Get-ChildItem -Path "$publishDirectory*.exe" | Compress-Archive -DestinationPath "$publishDirectory$finalExeName-$finalBuildVersion.zip" -CompressionLevel "Fastest" -Update
