@@ -8,6 +8,21 @@
 [![GitHub Release Date](https://img.shields.io/github/release-date/JAGFx/ts-map?style=flat-square)](https://github.com/JAGFx/ts-map/releases/latest)
 [![Discord](https://img.shields.io/discord/764915323693826059.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/8abqrEeFxF)
 
+# Important note
+
+> After a huge and long search, I still haven't found a solution to the last problems that came up. It's clearly out of my field of knowledge.
+>
+> So I think the best way to continue exporting tiles for my project is to work on a new (again) project.
+>
+> Its focus will be somewhat different. The maintainer of the original project does an impressive job. But he doesn't provide a console.
+>
+> The idea here would be to create a small console application that will only consume the original project and that will compliant to the Ets2-Dashboad-Skin project requirements.
+>
+> I don't know when this will be available. At the moment, I'm a bit fed up with it.
+Don't worry, the project is not dead. I'll get it done.
+
+This version is no longer maintained. See the [feat/@next](https://github.com/JAGFx/ts-map/tree/feat/%40next)
+
 ## About
 
 This project are written on C#. This app are used to exctact datas from the game file and export as Json files or Png files
