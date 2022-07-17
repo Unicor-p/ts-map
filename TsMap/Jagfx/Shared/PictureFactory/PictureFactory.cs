@@ -11,7 +11,7 @@ namespace TsMap.Jagfx.Shared.PictureFactory {
 
         protected void Save( string dir, string fileName, ImageFormat format ) {
             // string fullDir  = Path.Combine( Store.Settings.OutputPath, Store.Game.Code, "latest/", dir );
-            string fullDir  = Path.Combine( AppPaths.OutputDir, "ets2", "latest/", dir );
+            string fullDir  = Path.Combine( AppPaths.OutputDir, Store.Instance.Game.Code, "latest/", dir );
             string fullPath = Path.Combine( fullDir,            fileName );
 
             Directory.CreateDirectory( fullDir );

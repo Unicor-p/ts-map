@@ -29,7 +29,7 @@ namespace TsMap.Canvas {
         private          PointF _lastPoint;
         private          PointF _startPoint;
         private          float  _scale     = 0.2f;
-        private readonly int    tileSize   = 256;
+        private readonly int    tileSize   = 512;
         private          int    mapPadding = 500;
 
         private bool _isGeneratingTileMap;

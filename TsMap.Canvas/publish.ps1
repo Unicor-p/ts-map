@@ -6,7 +6,6 @@ $finalExeName = "TsMap"
 $workingDirectory = Get-Location
 $xml = [Xml] (Get-Content $workingDirectory\$project\$project.csproj)
 
-Write-Host "C: " $workingDirectory\$project\$project.csproj
 $assemblyVersion = [System.Version]::Parse($xml.Project.PropertyGroup.Version)
 $initialVersion = [Version] $assemblyVersion
 
