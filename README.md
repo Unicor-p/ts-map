@@ -1,11 +1,11 @@
 # TS Map - Map renderer
 #### Euro Truck Simulator 2 and American Truck Simulator
 
-[![GitHub Version](https://img.shields.io/github/v/release/JAGFx/ts-map?style=flat-square)](https://github.com/JAGFx/ts-map/releases/latest)
-[![GitHub Commit since](https://img.shields.io/github/commits-since/JAGFx/ts-map/v0.10?style=flat-square)](https://github.com/JAGFx/ts-map/releases)
-[![GitHub Release Download](https://img.shields.io/github/downloads/JAGFx/ts-map/total?style=flat-square)](https://github.com/JAGFx/ts-map/releases/latest)
-[![Github Licence](https://img.shields.io/github/license/JAGFx/ts-map?style=flat-square)](https://github.com/JAGFx/ts-map/blob/master/README.md)
-[![GitHub Release Date](https://img.shields.io/github/release-date/JAGFx/ts-map?style=flat-square)](https://github.com/JAGFx/ts-map/releases/latest)
+[![GitHub Version](https://img.shields.io/github/v/release/Unicor-p/ts-map?style=flat-square)](https://github.com/Unicor-p/ts-map/releases/latest)
+[![GitHub Commit since](https://img.shields.io/github/commits-since/Unicor-p/ts-map/v0.10?style=flat-square)](https://github.com/Unicor-p/ts-map/releases)
+[![GitHub Release Download](https://img.shields.io/github/downloads/Unicor-p/ts-map/total?style=flat-square)](https://github.com/Unicor-p/ts-map/releases/latest)
+[![Github Licence](https://img.shields.io/github/license/Unicor-p/ts-map?style=flat-square)](https://github.com/Unicor-p/ts-map/blob/master/README.md)
+[![GitHub Release Date](https://img.shields.io/github/release-date/Unicor-p/ts-map?style=flat-square)](https://github.com/Unicor-p/ts-map/releases/latest)
 [![Discord](https://img.shields.io/discord/764915323693826059.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/8abqrEeFxF)
 
 # Important note
@@ -21,7 +21,7 @@
 > I don't know when this will be available. At the moment, I'm a bit fed up with it.
 Don't worry, the project is not dead. I'll get it done.
 
-This version is no longer maintained. See the [feat/@next](https://github.com/JAGFx/ts-map/tree/feat/%40next)
+This version is no longer maintained. See the [feat/@next](https://github.com/Unicor-p/ts-map/tree/feat/%40next)
 
 ## About
 
@@ -42,7 +42,7 @@ I'm decide to rework full original project. Now you can use it from a console an
 
 ### Console
 
-- Step 1: [Download](https://github.com/JAGFx/ts-map/releases/tag/v1.0.0-cli-beta) and extract the archive on your desktop
+- Step 1: [Download](https://github.com/Unicor-p/ts-map/releases/tag/v1.0.0-cli-beta) and extract the archive on your desktop
 - Step 2: Open a Windows console
 - Step 3: Generate a setting file: `TsMap2.exe export -s`
 - Step 4: Follow instructions
@@ -102,9 +102,9 @@ This project can:
 
 |Map|Game|Version|Release|
 |---|---|---|---|
-|Base|Euro Truck Simulator 2|v1.40.3.25|[Download](https://github.com/JAGFx/ts-map/releases/download/v0.10/jagfx-map-ets2.tar.gz)|
+|Base|Euro Truck Simulator 2|v1.40.3.25|[Download](https://github.com/Unicor-p/ts-map/releases/download/v0.10/jagfx-map-ets2.tar.gz)|
 |Base|American Truck Simulator *|v1.40.3.3|Not enough DLC|
-|Promod|Euro Truck Simulator 2 *|v2.55|[Download](https://github.com/JAGFx/ts-map/releases/download/v0.10/jagfx-map-promod.tar.gz)|
+|Promod|Euro Truck Simulator 2 *|v2.55|[Download](https://github.com/Unicor-p/ts-map/releases/download/v0.10/jagfx-map-promod.tar.gz)|
 |Promod Canada|American Truck Simulator *|v1.0.1|Not enough DLC|
 
 > *The tested mods load and get drawn but I haven't looked at anything specific so it's always possible there will be some items missing or things will get drawn that shouldn't.
